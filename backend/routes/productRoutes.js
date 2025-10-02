@@ -1,6 +1,6 @@
 import express from 'express'
 import { createProducts, deleteProduct, getAllproducts, getSingleProduct, updateProduct } from '../controller/productController.js'
-import { verifyUserAuth } from '../Middleware/userAuth.js'
+import { roleBasedAccess, verifyUserAuth } from '../Middleware/userAuth.js'
 
 
 const router = express.Router()
@@ -8,11 +8,12 @@ const router = express.Router()
 //route
 router.route("/products").
 get(verifyUserAuth,getAllproducts).
-post(createProducts)
+post(verifyUserAuth,roleBasedAccess('admin'), createProducts)
+
 router.route("/products/:id").
-put(updateProduct)
-.delete(deleteProduct).
-get(getSingleProduct)
+put(verifyUserAuth,roleBasedAccess('admin'),updateProduct)
+.delete(verifyUserAuth,roleBasedAccess('admin'),deleteProduct).
+get(verifyUserAuth,getSingleProduct)
 
 
 export default router

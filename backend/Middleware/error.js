@@ -7,7 +7,7 @@ export default (err,req,res,next)=>{
 
     if(err.name==='CastError'){
 
-        const message = `This is invalid resource${err.path}`
+        const message = `This is invalid resource ${err.path}`
         err = new HandleEroor(message,404)
     }
     //Duplicate key error

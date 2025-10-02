@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import validator from 'validator'
 import bcryptjs from "bcryptjs";
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 const userSchema = new mongoose.Schema({
     name:{
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
     password:{
         type:String,
         required:[true,"Please Enter Your Password"],
-        minLength:[8,"Password should contain more than 8 characters"]
+        minLength:[3,"Password should contain more than 30 characters"]
         ,select:false
     },
     avathar:{
@@ -44,14 +45,17 @@ const userSchema = new mongoose.Schema({
 },{timestamps:true})
 
 //password hashing
-userSchema.pre("save",async function(){
+userSchema.pre("save",async function(next){
    
-    
-    this.password=await bcryptjs.hash(this.password,10)
+   
+   
     if(!this.isModified("password")){
         return next()
     }
 
+    
+    this.password=await bcryptjs.hash(this.password,10)
+    next()
 })
 
 
@@ -75,7 +79,17 @@ userSchema.methods.verifyPassword= async function(userEnteredPassword){
     
     return await bcryptjs.compare(userEnteredPassword,this.password)
 }
+////generating token
 
+
+userSchema.methods.generatePasswordResetToken=function(){
+    const resetToken = crypto.randomBytes(20).toString("hex")
+    console.log(resetToken)
+   this.resetPasswordToken=crypto.createHash('sha256')
+   .update(resetToken).digest("hex")
+    this.resetPasswordExpire=Date.now()+30*20*1000//30 min
+    return resetToken
+}
 
 
 

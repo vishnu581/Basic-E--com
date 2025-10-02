@@ -20,6 +20,6 @@ export const sendToken= (user,statusCode,res)=>{
         token
 
     })
-    console.log(token);
+    
     
 }

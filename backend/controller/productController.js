@@ -7,7 +7,8 @@ import APIFunctionality from "../utils/apiFunctionlity.js";
 
 
 export const createProducts = handelAsyncError (async(req,res,next)=>{
- 
+   console.log(req.user.id)
+  req.body.user=req.user.id
   const product =  await Product.create(req.body)
   res.status(201).json({
     success:true,
