@@ -208,3 +208,68 @@ export const updateProfile=handelAsyncError(async(req,res,next)=>{
  })
 
 })
+
+//ADMIN GETTING USER DETAILS
+
+
+export const getUserList= handelAsyncError(async(req,res,next)=>{
+    const users= await User.find()
+     if(!users) return next(new HandleEroor("No Users",400))
+    res.status(200).json({
+        success:true,
+        users
+    })
+})
+
+//ADMIN GITIING ONE USER INFORMATION
+
+
+export const getSingleUser= handelAsyncError(async(req,res,next)=>{
+    
+   const id = req.params.id
+    
+    const user= await User.findById(id)
+   if(!user) return next(new HandleEroor("No User",400))
+   
+    res.status(200).json({
+        success:true,
+        user
+    })
+})
+
+//admin - changin user role
+
+export const  updateUserRole=handelAsyncError(async(req,res,next)=>{
+    const {role}=req.body
+    const newUserData={
+        role
+    }
+ 
+    const user = await User.findByIdAndUpdate(req.user.id,newUserData,{
+        new:true,
+        runValidators:true
+    })
+      if(!user) return next(new HandleEroor("No User",400))
+     res.status(200).json({
+        success:true,
+        user
+    })
+})
+
+//admin delete user profile
+
+export const  deleteUser=handelAsyncError(async(req,res,next)=>{
+ 
+    const user = await User.findById(req.params.id)
+      if(!user) return next(new HandleEroor("No User",400))
+    
+    await User.findByIdAndDelete(req.params.id)
+    
+    
+        res.status(200).json({
+        success:true,
+        message:"user deleted successfully"
+        
+    })
+})
+

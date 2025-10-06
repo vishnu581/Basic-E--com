@@ -129,3 +129,96 @@ export const getSingleProduct = handelAsyncError(async (req,res,next)=>{
 })  
 
 
+// admin controller
+
+export const getAdminProducts = handelAsyncError(async(req,res,next)=>{
+
+   const products = await Product.find()
+   res.status(200).json({
+    success:true,
+    products
+
+   })
+
+})
+
+//get product review * check in the future for get mutiple review and time is before 8:05
+
+export const  createReviewForProduct=handelAsyncError(async(req,res,next)=>{
+    
+const {rating,commet,ProductId}=req.body
+
+const review = {
+  user:req.user._id,
+  name:req.user.name,
+  rating:Number(rating),
+  commet
+
+}
+
+const product = await Product.findById(ProductId)
+console.log(product);
+
+const reviewExists =product.reviews.find(reviwe=>reviwe.user.toString()===req.user.id)
+
+if(reviewExists){
+  product.reviews.forEach(review=>{
+    if(review.user.toString()===req.user.id){
+      review.rating=rating
+      review.commet=commet
+    }
+  })
+
+}else{
+  product.reviews.push(review)
+}
+
+let avg = 0
+product.reviews.forEach(reviwe=>{
+  avg=avg+review.rating
+})
+product.ratings=avg/product.reviews.length
+await product.save({validateBeforeSave:false})
+res.status(200).json({
+  success:true,
+  product
+})
+
+
+})
+
+
+//Getting reviews
+
+export const getProductReviews=handelAsyncError(async(req,res,next)=>{
+  console.log(req.query.id);
+  
+  const product =await Product.findById(req.query.id)
+  if(!product){
+    return next(new HandleEroor("Product not found"))
+  }
+  res.status(200).json({
+    success:true,
+    reviews:product.reviews
+
+  })
+})
+
+// delete review  need to complete 8:17,when D and product ID and and id in review,make sure in the future when review array is shown time is 8:19
+export const deleteReview=handelAsyncError(async(req,res,next)=>{
+ 
+  
+  const product =await Product.findById(req.query.productId)
+  
+  if(!product){
+    return next(new HandleEroor("Product not found"))
+  }
+
+  
+  const reviews = product.reviews.filter(review=>review._id.toString()!==req.query.id.toString())
+    console.log(reviews)
+  res.status(200).json({
+    success:true,
+    reviews:product
+  })
+})
